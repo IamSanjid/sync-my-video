@@ -1,0 +1,36 @@
+<head>
+  <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+  <style>
+    .name_field * {
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="name_field" id="ask_name">
+    <textarea id="txt_name"></textarea>
+    <button onclick="nameGiven()">Submit</button>
+  </div>
+  <div id="player" style="display: none;">
+    <video
+    id="my-player"
+    class="video-js"
+    controls
+    >
+      <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a
+        web browser that
+        <a href="https://videojs.com/html5-video-support/" target="_blank"
+          >supports HTML5 video</a
+        >
+      </p>
+    </video>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/ui-handler.js"></script>
+  <script src="js/connection-handler.js"></script>
+</body>
