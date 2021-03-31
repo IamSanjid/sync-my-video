@@ -14,6 +14,7 @@ let video_stats =
   src: 'empty',
   currentTime: 0.0
 };
+let users = {};
 
 function is_admin(username)
 {
@@ -27,15 +28,19 @@ function is_admin(username)
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/public/html/index.html');
 });
 
 io.on('connection', (socket) => {
   socket.on('join', (name) =>
   {
-    console.log(`${name} has joined.`);
-    socket.broadcast.emit('join', name);
-    socket.emit('joined', name, video_stats);
+    if (users[name] == undefined)
+    {
+      console.log(`${name} has joined.`);
+      socket.broadcast.emit('join', name);
+      socket.emit('joined', name, video_stats);
+      users[name] = true;
+    }
   });
   socket.on('load video', (url) =>
   {
@@ -70,7 +75,7 @@ io.on('connection', (socket) => {
   });
   socket.on('pause', (username, current_time) =>
   {
-    if (is_admin(username))
+    if (is_admin(username) && video_stats.state != 'waiting')
     {
       console.log(`${username} paused at ${current_time}`);
       socket.broadcast.emit('pause', current_time);
@@ -89,20 +94,20 @@ io.on('connection', (socket) => {
   });
   socket.on('waiting', (username, current_time) =>
   {
-    if (video_stats.state != 'waiting')
+    console.log(`${username} is waiting at ${current_time}`);
+    /*if (video_stats.state != 'waiting')
     {
-      console.log(`${username} is waiting at ${current_time}`);
       socket.broadcast.emit('waiting', current_time);
       video_stats.state = 'waiting';
       video_stats.currentTime = current_time;
-    }
+    }*/
   });
   socket.on('continue', (username, current_time) =>
   {
     console.log(`${username} now continuing from ${current_time}`);
-    socket.broadcast.emit('continue', current_time);
+    /*socket.broadcast.emit('continue', current_time);
     video_stats.currentTime = current_time;
-    video_stats.state = 'play'
+    video_stats.state = 'play'*/
   });
   /* end of player */
   socket.on('disconnect', () => {

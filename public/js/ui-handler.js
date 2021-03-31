@@ -29,36 +29,34 @@ function make_me_admin(secret_phase)
 
 function disable_player()
 {
-  player.controlBar.progressControl.disable();
-  player.controlBar.playToggle = false;
+  player.controls(false);
 }
 
 function enable_player()
 {
-  player.controlBar.progressControl.enable();
-  player.controlBar.playToggle = true;
+  player.controls(true);
 }
 
 function seek(current_time)
 {
   if (player.currentTime() != current_time)
   {
+    executedCmd.seek = true;
     player.currentTime(current_time);
-    executedCmd = true;
   }
 }
 
 function pause()
 {
+  executedCmd.pause = true;
   player.pause();
-  executedCmd = true;
   videojs.log('paused');
 }
 
 function play()
 {
+  executedCmd.play = true;
   player.play();
-  executedCmd = true;
   videojs.log('playing');
 }
 
@@ -71,7 +69,7 @@ function load_url(source)
 }
 
 player.on('pause', function() {
-  if (!is_executed())
+  if (!is_executed('pause'))
   {
     socket.emit('pause', user_name, this.currentTime());
   }
@@ -79,7 +77,7 @@ player.on('pause', function() {
 });
 
 player.on('play', function() {
-  if (!is_executed())
+  if (!is_executed('play'))
   {
     socket.emit('play', user_name, this.currentTime());
   }
@@ -87,7 +85,7 @@ player.on('play', function() {
 });
 
 player.on('seeked', function() {
-  if (!is_executed())
+  if (!is_executed('seeked'))
   {
     socket.emit('seeked', user_name, this.currentTime());
   }

@@ -5,7 +5,12 @@ var div_player = document.getElementById("player");
 var div_ask_name = document.getElementById("ask_name");
 var txt_name = document.getElementById("txt_name");
 var user_name = '';
-var executedCmd = false;
+var executedCmd = 
+{
+    pause: false,
+    play: false,
+    seek: false,    
+};
 
 var options = {    
 };
@@ -23,12 +28,25 @@ function is_player_loaded()
     return player.src() != "" || player.src() != null;
 }
 
-function is_executed()
+function is_executed(cmd = 'any')
 {
-    if (executedCmd)
+    let result = false;
+    if (cmd == 'any')
     {
-        executedCmd = false;
-        return true;
+        for (const cCmd in executedCmd)
+        {
+            if (executedCmd[cCmd])
+            {
+                result = true;
+                break;
+            }
+        }
     }
-    return false;
+    else
+    {
+        result = executedCmd[cmd];
+        executedCmd[cmd] = false;
+    }
+    
+    return result;
 }
