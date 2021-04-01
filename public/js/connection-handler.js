@@ -34,6 +34,7 @@ socket.on('join', (name) =>
 socket.on('load video', (url) =>
 {
   load_url(url);
+  addMessage("Loading video from " + url);
 });
 
 socket.on('pause', (current_time) =>
@@ -42,6 +43,7 @@ socket.on('pause', (current_time) =>
   {
     seek(current_time);
     pause();
+    addMessage("Paused the video....");
   }
 });
 socket.on('play', (current_time) =>
@@ -51,6 +53,7 @@ socket.on('play', (current_time) =>
     state = 'play';
     seek(current_time);
     play();
+    addMessage("Playing the video....");
   }
 });
 socket.on('seeked', (current_time) =>
