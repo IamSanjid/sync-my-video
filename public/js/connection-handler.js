@@ -1,5 +1,8 @@
 socket.on('joined', (name, video_stats) =>
-{  
+{
+  div_player.style.display = 'block';
+  div_join.remove();  
+
   if (video_stats.src != "empty")
   {
     load_url(video_stats.src);
@@ -25,6 +28,7 @@ socket.on('admin', (result) =>
 socket.on('join', (name) =>
 {
   videojs.log("joined " + name + "!");
+  addMessage(name + " has joined the party!");
 });
 
 socket.on('load video', (url) =>
@@ -75,5 +79,13 @@ socket.on('continue', (current_time) =>
     enable_player();
     seek(current_time);
     play();
+  }
+});
+
+socket.on('chat message', (username, msg) =>
+{
+  if (has_joined)
+  {
+    addMessage(username + ": " + msg);
   }
 });

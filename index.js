@@ -34,13 +34,10 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   socket.on('join', (name) =>
   {
-    if (users[name] == undefined)
-    {
-      console.log(`${name} has joined.`);
-      socket.broadcast.emit('join', name);
-      socket.emit('joined', name, video_stats);
-      users[name] = true;
-    }
+    console.log(`${name} has joined.`);
+    socket.broadcast.emit('join', name);
+    socket.emit('joined', name, video_stats);
+    users[name] = true;
   });
   socket.on('load video', (url) =>
   {
@@ -60,6 +57,13 @@ io.on('connection', (socket) => {
     else
     {
       socket.emit('admin', false);
+    }
+  });
+  socket.on('chat message', (username, msg) =>
+  {
+    if (users[username])
+    {
+      io.emit('chat message', username, msg);
     }
   });
   /* player */

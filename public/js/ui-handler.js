@@ -1,11 +1,11 @@
+join_form.addEventListener("submit", onJoinSubmit, false);
 
-function nameGiven()
+function onJoinSubmit(e)
 {
-  if (txt_name.value != "")
+  e.preventDefault();
+  if (join_input.value && !has_joined)
   {
-    socket.emit('join', txt_name.value);
-    div_player.style.display = 'block';
-    div_ask_name.style.display = 'none';
+    socket.emit('join', join_input.value);
   }
 }
 
