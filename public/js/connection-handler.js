@@ -82,6 +82,14 @@ socket.on('continue', (current_time) =>
   }
 });
 
+socket.on('left', (username) =>
+{
+  if (has_joined)
+  {
+    videojs.log(username + ' left the party!');
+  }
+});
+
 socket.on('chat message', (username, msg) =>
 {
   if (has_joined)

@@ -53,3 +53,8 @@ function is_executed(cmd = 'any')
     
     return result;
 }
+
+function addMessage(msg)
+{
+    return;
+}

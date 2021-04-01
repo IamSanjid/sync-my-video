@@ -14,7 +14,6 @@ let video_stats =
   src: 'empty',
   currentTime: 0.0
 };
-let users = {};
 
 function is_admin(username)
 {
@@ -37,7 +36,8 @@ io.on('connection', (socket) => {
     console.log(`${name} has joined.`);
     socket.broadcast.emit('join', name);
     socket.emit('joined', name, video_stats);
-    users[name] = true;
+    socket.username = name;
+    socket.hasJoined = true;
   });
   socket.on('load video', (url) =>
   {
@@ -46,59 +46,59 @@ io.on('connection', (socket) => {
     video_stats.src = url;
     video_stats.currentTime = 0.0;
   });
-  socket.on('admin', (username, secret_phase) =>
+  socket.on('admin', (secret_phase) =>
   {
-    console.log(`${username} is trying to be admin with key ${secret_phase}`);
+    console.log(`${socket.username} is trying to be admin with key ${secret_phase}`);
     if (secret_phase == '123445678' && admin_user == "")
     {
       socket.emit('admin', true);
-      admin_user = username;
+      admin_user = socket.username;
     }
     else
     {
       socket.emit('admin', false);
     }
   });
-  socket.on('chat message', (username, msg) =>
+  socket.on('chat message', (msg) =>
   {
-    if (users[username])
+    if (socket.hasJoined)
     {
-      io.emit('chat message', username, msg);
+      io.emit('chat message', socket.username, msg);
     }
   });
   /* player */
-  socket.on('play', (username, current_time) =>
+  socket.on('play', (current_time) =>
   {
-    if (is_admin(username) && video_stats.state != 'waiting')
+    if (is_admin(socket.username) && video_stats.state != 'waiting')
     {
-      console.log(`${username} playing from ${current_time}`);
+      console.log(`${socket.username} playing from ${current_time}`);
       socket.broadcast.emit('play', current_time);
       video_stats.state = 'play';
       video_stats.currentTime = current_time;
     }
   });
-  socket.on('pause', (username, current_time) =>
+  socket.on('pause', (current_time) =>
   {
-    if (is_admin(username) && video_stats.state != 'waiting')
+    if (is_admin(socket.username) && video_stats.state != 'waiting')
     {
-      console.log(`${username} paused at ${current_time}`);
+      console.log(`${socket.username} paused at ${current_time}`);
       socket.broadcast.emit('pause', current_time);
       video_stats.state = 'pause';
       video_stats.currentTime = current_time;
     }
   });
-  socket.on('seeked', (username, current_time) =>
+  socket.on('seeked', (current_time) =>
   {
-    if (is_admin(username) && video_stats.state != 'waiting')
+    if (is_admin(socket.username) && video_stats.state != 'waiting')
     {
-      console.log(`${username} seeked to ${current_time}`);
+      console.log(`${socket.username} seeked to ${current_time}`);
       socket.broadcast.emit('seeked', current_time);
       video_stats.currentTime = current_time;
     }
   });
-  socket.on('waiting', (username, current_time) =>
+  socket.on('waiting', (current_time) =>
   {
-    console.log(`${username} is waiting at ${current_time}`);
+    console.log(`${socket.username} is waiting at ${current_time}`);
     /*if (video_stats.state != 'waiting')
     {
       socket.broadcast.emit('waiting', current_time);
@@ -106,16 +106,18 @@ io.on('connection', (socket) => {
       video_stats.currentTime = current_time;
     }*/
   });
-  socket.on('continue', (username, current_time) =>
+  socket.on('continue', (current_time) =>
   {
-    console.log(`${username} now continuing from ${current_time}`);
+    console.log(`${socket.username} now continuing from ${current_time}`);
     /*socket.broadcast.emit('continue', current_time);
     video_stats.currentTime = current_time;
     video_stats.state = 'play'*/
   });
   /* end of player */
+
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    io.emit('left', socket.username);
+    console.log(`${socket.username} disconnected!`);
   });
 });
 
