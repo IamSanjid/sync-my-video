@@ -1,7 +1,7 @@
 socket.on('joined', (name, video_stats) =>
 {
-  div_player.style.display = 'block';
-  div_join.remove();  
+  div_content.style.display = '';
+  div_join.remove();
 
   if (video_stats.src != "empty")
   {
@@ -86,7 +86,8 @@ socket.on('left', (username) =>
 {
   if (has_joined)
   {
-    videojs.log(username + ' left the party!');
+    videojs.log(username + ' left');
+    addMessage(username + ' left the party!');
   }
 });
 

@@ -1,4 +1,5 @@
 join_form.addEventListener("submit", onJoinSubmit, false);
+chat_form.addEventListener("submit", onChatMessageSubmit, false);
 
 function onJoinSubmit(e)
 {
@@ -7,6 +8,16 @@ function onJoinSubmit(e)
   {
     socket.emit('join', join_input.value);
   }
+}
+
+function onChatMessageSubmit(e)
+{
+  e.preventDefault();
+  if (chat_input.value && has_joined)
+  {
+    socket.emit('chat message', chat_input.value);
+  }
+  chat_input.value = '';
 }
 
 function set_source(url)
