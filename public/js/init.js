@@ -1,66 +1,29 @@
-var HIDDEN_URL = 
+const HIDDEN_URL = 
 "http://server5.ftpbd.net/FTP-5/Anime%20%26%20Cartoon%20TV%20Series/Nisemonogatari%20%28%202012%20%29/Season%201/%5BNoobSubs%5D%20Nisemonogatari%2001%20%28720p%20Blu-ray%208bit%20AAC%29.mp4"
 
-var div_content = document.getElementById("content");
-var div_join = document.getElementById("join");
+const SAMPLE_URL =
+"https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_2mb.mp4";
 
-var join_input = document.getElementById("join-input");
-var join_form = document.getElementById("join-form");
+const socket = io();
 
-var chat_input = document.getElementById("chat-input");
-var chat_form = document.getElementById("chat-form");
+const { username } = Qs.parse(location.search, {
+    ignoreQueryPrefix: true
+});
 
-var messages = document.getElementById('messages');
-var chat_panel = document.getElementById('chat-panel');
+const chat_input = document.getElementById("chat-input");
+const chat_form = document.getElementById("chat-form");
+const messages = document.getElementById('messages');
+const chat_panel = document.getElementById('chat-panel');
 
-var user_name = '';
-var executedCmd = 
-{
-    pause: false,
-    play: false,
-    seek: false,    
+const options = {
 };
-
-var options = {    
-};
-var player = videojs('my-player', options, function onPlayerReady() {
-    videojs.log('Your player is ready!');
+const player = videojs('my-player', options, function onPlayerReady() {
+    videojs.log(username + ', your player is ready!');
+    
+    socket.emit('join', username);
     this.responsive(true);
     this.fluid(true);
 });
-
-var socket = io();
-var has_joined = false;
-var state = 'pause';
-var admin = false;
-
-function is_player_loaded()
-{
-    return player.src() != "" || player.src() != null;
-}
-
-function is_executed(cmd = 'any')
-{
-    let result = false;
-    if (cmd == 'any')
-    {
-        for (const cCmd in executedCmd)
-        {
-            if (executedCmd[cCmd])
-            {
-                result = true;
-                break;
-            }
-        }
-    }
-    else
-    {
-        result = executedCmd[cmd];
-        executedCmd[cmd] = false;
-    }
-    
-    return result;
-}
 
 function addMessage(msg)
 {
