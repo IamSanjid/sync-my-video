@@ -1,3 +1,14 @@
+function loadVideo(url)
+{
+  socket.emit('loadVideo', url);
+}
+
+function setSource(url)
+{
+  player.src(url);
+}
+
+
 chat_form.addEventListener('submit', (e) =>
 {
   e.preventDefault();

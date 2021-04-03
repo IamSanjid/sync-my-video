@@ -5,8 +5,13 @@ const socketio = require('socket.io');
 const {
   joinUser,
   getUser,
-  userLeave
+  userLeave,
+  setVideoStats
 } = require('./utils/users');
+const { 
+  createVideoStats,
+  processVideoEvt
+} = require('./utils/video-stats');
 
 const app = express();
 const server = http.createServer(app);
@@ -29,6 +34,20 @@ io.on('connection', socket =>
   {
     io.emit('chatMessage', { username: getUser(socket.id).username, msg: msg });
   });
+  
+  socket.on('loadVideo', (url) =>
+  {
+    console.log(`loading video ${url}`);
+    setVideoStats(socket.id, createVideoStats(url));
+  });
+  socket.on('videoEvt', (evt) =>
+  {
+    const user = getUser(socket.id);
+    const procEvt = processVideoEvt(evt, user.videoStats);
+    setVideoStats(user.id, procEvt.videoStats);
+    socket.broadcast.emit(procEvt.evt, procEvt.videoStats);
+  });
+  
   socket.on('disconnect', () =>
   {
     const user = userLeave(socket.id);

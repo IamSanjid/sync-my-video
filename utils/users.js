@@ -20,9 +20,15 @@ function userLeave(id) {
     }
 }
 
+function setVideoStats(id, videoStats)
+{
+    getUser(id).videoStats = videoStats;
+}
+
 module.exports = 
 {
     joinUser,
     getUser,
-    userLeave
+    userLeave,
+    setVideoStats
 };
