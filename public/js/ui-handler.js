@@ -1,14 +1,24 @@
-function loadVideo(url)
-{
-  socket.emit('loadVideo', url);
-}
-
 function setSource(url)
 {
-  player.src(url);
-  currentVideoStats.src = url;
+  if (url != player.src())
+  {
+    socket.emit('loadVideo', url);
+  }
 }
 
+function loadVideo()
+{
+  player.src(currentVideoStats.src);
+  player.currentTime(currentVideoStats.currentTime);
+  if (currentVideoStats.state === 'play')
+  {
+    player.play();
+  }
+  else if (currentVideoStats.state === 'pause')
+  {
+    player.pause();
+  }
+}
 
 chat_form.addEventListener('submit', (e) =>
 {
@@ -35,7 +45,7 @@ player.on('pause', function()
   socket.emit('videoEvt', 'pause', currentVideoStats);
 });
 
-player.on('seek', function()
+player.on('seeked', function()
 {
   currentVideoStats.currentTime = player.currentTime();  
   socket.emit('videoEvt', 'seek', currentVideoStats);

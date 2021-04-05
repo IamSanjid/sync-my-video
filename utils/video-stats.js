@@ -1,50 +1,51 @@
-function createVideoStats(url, currentTime = 0.0, state = 'pause')
+let currentVideoStats = null;
+
+function setVideoStats(url, currentTime = 0.0, state = 'pause')
 {
-    const videoStats = {
+    currentVideoStats = {
         src: url,
         currentTime: currentTime,
         state: state
     };
-    return videoStats;
 }
 
-function processVideoEvt(evt, videoStats, userVideoStats)
+function getVideoStats()
 {
-    if (evt === 'play' && userVideoStats.stat !== 'play')
+    return currentVideoStats;
+}
+
+function resetVideoStats()
+{
+    currentVideoStats = null;
+}
+
+function processVideoEvt(evt, videoStats)
+{
+    if (evt === 'play' && currentVideoStats.state !== 'play')
     {
-        userVideoStats.state = 'play';
-        userVideoStats.currentTime = videoStats.currentTime;
-        procVideoEvt.evt = 'play';
-        return {
-            evt: 'play',
-            videoStats: userVideoStats
-        };
+        currentVideoStats.state = 'play';
+        currentVideoStats.currentTime = videoStats.currentTime;
+        return 'play';
     }
-    else if (evt === 'pause' && userVideoStats.stat !== 'pause')
+    else if (evt === 'pause' && currentVideoStats.state !== 'pause')
     {
-        userVideoStats.state = 'pause';
-        userVideoStats.currentTime = videoStats.currentTime;
-        procVideoEvt.evt = 'pause';
-        return {
-            evt: 'pause',
-            videoStats: userVideoStats
-        };
+        currentVideoStats.state = 'pause';
+        currentVideoStats.currentTime = videoStats.currentTime;
+        return 'pause';
     }
-    else if (evt === 'seek' && videoStats.currentTime !== userVideoStats.currentTime)
+    else if (evt === 'seek' && videoStats.currentTime !== currentVideoStats.currentTime)
     {
-        userVideoStats.state = videoStats.state;
-        userVideoStats.currentTime = videoStats.currentTime;
-        procVideoEvt.evt = 'seek';
-        return {
-            evt: 'seek',
-            videoStats: userVideoStats
-        };
+        currentVideoStats.state = videoStats.state;
+        currentVideoStats.currentTime = videoStats.currentTime;
+        return 'seek';
     }
     return null;
 }
 
 module.exports =
 {
-    createVideoStats,
+    setVideoStats,
+    getVideoStats,
+    resetVideoStats,
     processVideoEvt
 };

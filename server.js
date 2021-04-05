@@ -6,10 +6,12 @@ const {
   joinUser,
   getUser,
   userLeave,
-  setVideoStats
+  userCount
 } = require('./utils/users');
 const { 
-  createVideoStats,
+  setVideoStats,
+  getVideoStats,
+  resetVideoStats,
   processVideoEvt
 } = require('./utils/video-stats');
 
@@ -27,8 +29,13 @@ io.on('connection', socket =>
   socket.on('join', (username) =>
   {
     const user = joinUser(socket.id, username);
+    const videoStats = getVideoStats();
     socket.broadcast.emit('message', `${user.username} has joined!`);
     socket.emit('message', 'Welcome to trashy sync video, ' + user.username + '!');
+    if (videoStats)
+    {
+      socket.emit('loadVideo', videoStats);
+    }
   });
   socket.on('chatMessage', (msg) =>
   {
@@ -38,16 +45,18 @@ io.on('connection', socket =>
   socket.on('loadVideo', (url) =>
   {
     console.log(`loading video ${url}`);
-    setVideoStats(socket.id, createVideoStats(url));
+    setVideoStats(url);
+    const stats = getVideoStats();
+    io.emit('loadVideo', stats);
   });
-  socket.on('videoEvt', (evt, vidoeStats) =>
+  socket.on('videoEvt', (evt, videoStats) =>
   {
-    const user = getUser(socket.id);
-    const procEvt = processVideoEvt(evt, videoStats, user.videoStats);
+    console.log(`video event: ${evt}`);
+    const procEvt = processVideoEvt(evt, videoStats);
     if (procEvt !== null)
     {
-      setVideoStats(user.id, procEvt.vidoeStats);
-      socket.broadcast.emit(procEvt.evt, procEvt.vidoeStats);
+      const stats = getVideoStats();
+      socket.broadcast.emit('videoEvt', procEvt, stats);
     }
   });
   
@@ -57,6 +66,11 @@ io.on('connection', socket =>
     if (user)
     {
       io.emit('message', `${user.username} has left!`);
+      console.log(`${user.username} left`);
+    }
+    if (userCount() === 0)
+    {
+      resetVideoStats();
     }
   });
 });
