@@ -25,6 +25,13 @@ const player = videojs('my-player', options, function onPlayerReady() {
     this.fluid(true);
 });
 
+var currentVideoStats = 
+{
+    src: '',
+    currentTime: 0.0,
+    state: 'pause'
+};
+
 function addMessage(msg)
 {
     var item = document.createElement('li');

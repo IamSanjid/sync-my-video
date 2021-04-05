@@ -8,12 +8,39 @@ function createVideoStats(url, currentTime = 0.0, state = 'pause')
     return videoStats;
 }
 
-function processVideoEvt(evt, currentVS)
+function processVideoEvt(evt, videoStats, userVideoStats)
 {
-    if (evt.videoStats.state !== currentVS.state)
+    if (evt === 'play' && userVideoStats.stat !== 'play')
     {
-        currentVS.state = evt.state;
+        userVideoStats.state = 'play';
+        userVideoStats.currentTime = videoStats.currentTime;
+        procVideoEvt.evt = 'play';
+        return {
+            evt: 'play',
+            videoStats: userVideoStats
+        };
     }
+    else if (evt === 'pause' && userVideoStats.stat !== 'pause')
+    {
+        userVideoStats.state = 'pause';
+        userVideoStats.currentTime = videoStats.currentTime;
+        procVideoEvt.evt = 'pause';
+        return {
+            evt: 'pause',
+            videoStats: userVideoStats
+        };
+    }
+    else if (evt === 'seek' && videoStats.currentTime !== userVideoStats.currentTime)
+    {
+        userVideoStats.state = videoStats.state;
+        userVideoStats.currentTime = videoStats.currentTime;
+        procVideoEvt.evt = 'seek';
+        return {
+            evt: 'seek',
+            videoStats: userVideoStats
+        };
+    }
+    return null;
 }
 
 module.exports =

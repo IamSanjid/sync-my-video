@@ -40,12 +40,15 @@ io.on('connection', socket =>
     console.log(`loading video ${url}`);
     setVideoStats(socket.id, createVideoStats(url));
   });
-  socket.on('videoEvt', (evt) =>
+  socket.on('videoEvt', (evt, vidoeStats) =>
   {
     const user = getUser(socket.id);
-    const procEvt = processVideoEvt(evt, user.videoStats);
-    setVideoStats(user.id, procEvt.videoStats);
-    socket.broadcast.emit(procEvt.evt, procEvt.videoStats);
+    const procEvt = processVideoEvt(evt, videoStats, user.videoStats);
+    if (procEvt !== null)
+    {
+      setVideoStats(user.id, procEvt.vidoeStats);
+      socket.broadcast.emit(procEvt.evt, procEvt.vidoeStats);
+    }
   });
   
   socket.on('disconnect', () =>

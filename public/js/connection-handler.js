@@ -13,14 +13,22 @@ socket.on('loadVideo', (url) =>
     setSource(url);
 });
 
-socket.on('play', (videoStats) =>
+socket.on('videoEvt', (evt, videoStats) =>
 {
-});
+    currentVideoStats = videoStats;
+    if (evt === 'play')
+    {        
+        player.currentTime(currentVideoStats.currentTime);        
+        player.play();
+    }
+    else if (evt === 'pause')
+    {        
+        player.currentTime(currentVideoStats.currentTime);
+        player.pause();
+    }
+    else if (evt === 'seek')
+    {
 
-socket.on('pause', (videoStats) =>
-{
-});
-
-socket.on('seek', (videoStats) =>
-{
+        player.currentTime(currentVideoStats.currentTime);        
+    }
 });
