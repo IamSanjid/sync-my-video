@@ -70,6 +70,7 @@ io.on('connection', socket =>
     }
     if (userCount() === 0)
     {
+      console.log('[*]no more users left resetting video stats...[*]');
       resetVideoStats();
     }
   });
