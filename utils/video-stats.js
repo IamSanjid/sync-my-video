@@ -1,51 +1,46 @@
-let currentVideoStats = null;
-
-function setVideoStats(url, currentTime = 0.0, state = 'pause')
+module.exports = class videostats 
 {
-    currentVideoStats = {
-        src: url,
-        currentTime: currentTime,
-        state: state
+  constructor(url, currentTime = 0.0, state = 'pause')
+  {
+    this.stats = {
+      src: url,
+      currentTime: currentTime,
+      state: state
     };
-}
+    this.followUserId = null;
+  }
 
-function getVideoStats()
-{
-    return currentVideoStats;
-}
-
-function resetVideoStats()
-{
-    currentVideoStats = null;
-}
-
-function processVideoEvt(evt, videoStats)
-{
-    if (evt === 'play' && currentVideoStats.state !== 'play')
+  processVideoEvt(evt, videoStats)
+  {
+    if (evt === 'play' && this.stats.state !== 'play')
     {
-        currentVideoStats.state = 'play';
-        currentVideoStats.currentTime = videoStats.currentTime;
-        return 'play';
+      this.stats.state = 'play';
+      this.stats.currentTime = videoStats.currentTime;
+      return 'play';
     }
-    else if (evt === 'pause' && currentVideoStats.state !== 'pause')
+    else if (evt === 'pause' && this.stats.state !== 'pause')
     {
-        currentVideoStats.state = 'pause';
-        currentVideoStats.currentTime = videoStats.currentTime;
-        return 'pause';
+      this.stats.state = 'pause';
+      this.stats.currentTime = videoStats.currentTime;
+      return 'pause';
     }
-    else if (evt === 'seek' && videoStats.currentTime !== currentVideoStats.currentTime)
+    else if (evt === 'seek' && videoStats.currentTime !== this.stats.currentTime)
     {
-        currentVideoStats.state = videoStats.state;
-        currentVideoStats.currentTime = videoStats.currentTime;
-        return 'seek';
+      this.stats.state = videoStats.state;
+      this.stats.currentTime = videoStats.currentTime;
+      return 'seek';
     }
-    return null;
-}
-
-module.exports =
-{
-    setVideoStats,
-    getVideoStats,
-    resetVideoStats,
-    processVideoEvt
+  }
+  
+  updateStats(newStats)
+  {
+    var event = null;
+    if (newStats.state !== this.stats.state)
+    {
+      event = newStats.state;
+    }
+    this.stats.currentTime = newStats.currentTime;
+    this.stats.state = newStats.state;
+    return event;
+  }
 };

@@ -6,20 +6,18 @@ const {
   joinUser,
   getUser,
   userLeave,
-  userCount
+  userCount,
+  getFirstUser
 } = require('./utils/users');
-const { 
-  setVideoStats,
-  getVideoStats,
-  resetVideoStats,
-  processVideoEvt
-} = require('./utils/video-stats');
+const videostats = require('./utils/video-stats');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
 const port = process.env.PORT || 3000;
+
+var videoStats = null;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -29,12 +27,11 @@ io.on('connection', socket =>
   socket.on('join', (username) =>
   {
     const user = joinUser(socket.id, username);
-    const videoStats = getVideoStats();
     socket.broadcast.emit('message', `${user.username} has joined!`);
     socket.emit('message', 'Welcome to trashy sync video, ' + user.username + '!');
     if (videoStats)
     {
-      socket.emit('loadVideo', videoStats);
+      socket.emit('loadVideo', videoStats.stats);
     }
   });
   socket.on('chatMessage', (msg) =>
@@ -45,18 +42,31 @@ io.on('connection', socket =>
   socket.on('loadVideo', (url) =>
   {
     console.log(`loading video ${url}`);
-    setVideoStats(url);
-    const stats = getVideoStats();
-    io.emit('loadVideo', stats);
+    videoStats = new videostats(url);
+    io.emit('loadVideo', videoStats.stats);
   });
-  socket.on('videoEvt', (evt, videoStats) =>
+  socket.on('videoEvt', (evt, _videoStats) =>
   {
     console.log(`video event: ${evt}`);
-    const procEvt = processVideoEvt(evt, videoStats);
-    if (procEvt !== null)
+    if (videoStats)
     {
-      const stats = getVideoStats();
-      socket.broadcast.emit('videoEvt', procEvt, stats);
+      const procEvt = videoStats.processVideoEvt(evt, _videoStats);
+      if (procEvt !== null)
+      {
+        socket.broadcast.emit('videoEvt', procEvt, videoStats.stats);
+      }
+    }
+  });
+  socket.on('updateVideoStats', (_videoStats) =>
+  {
+    const id = videoStats.followUserId;
+    if (id)
+    {
+      const changedEvt = videoStats.updateStats(_videoStats);
+      if (changedEvt)
+      {
+        socket.broadcast.emit('videoEvt', changedEvt, videoStats.stats);
+      }
     }
   });
   
@@ -71,7 +81,11 @@ io.on('connection', socket =>
     if (userCount() === 0)
     {
       console.log('[*]no more users left resetting video stats...[*]');
-      resetVideoStats();
+      videoStats = null;
+    }
+    else
+    {
+      videoStats.followUserId = getFirstUser().id;
     }
   });
 });

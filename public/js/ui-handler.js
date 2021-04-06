@@ -3,6 +3,7 @@ function setSource(url)
   if (url != player.src())
   {
     socket.emit('loadVideo', url);
+    updateStats();
   }
 }
 
@@ -50,3 +51,14 @@ player.on('seeked', function()
   currentVideoStats.currentTime = player.currentTime();  
   socket.emit('videoEvt', 'seek', currentVideoStats);
 });
+
+function updateStats()
+{
+  clearTimeout(updateStatsTimeout);
+  currentVideoStats.currentTime = player.currentTime();
+  if (!player.ended())
+  {
+    socket.emit('updateVideoStats', currentVideoStats);
+    updateStatsTimeout = setTimeout(updateStats, 1000);
+  }
+}

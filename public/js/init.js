@@ -7,7 +7,7 @@ const SAMPLE_URL =
 const socket = io();
 
 const { username } = Qs.parse(location.search, {
-    ignoreQueryPrefix: true
+  ignoreQueryPrefix: true
 });
 
 const chat_input = document.getElementById("chat-input");
@@ -18,24 +18,26 @@ const chat_panel = document.getElementById('chat-panel');
 const options = {
 };
 const player = videojs('my-player', options, function onPlayerReady() {
-    videojs.log(username + ', your player is ready!');
-    
-    socket.emit('join', username);
-    this.responsive(true);
-    this.fluid(true);
+  videojs.log(username + ', your player is ready!');
+  
+  socket.emit('join', username);
+  this.responsive(true);
+  this.fluid(true);
 });
 
 var currentVideoStats = 
 {
-    src: '',
-    currentTime: 0.0,
-    state: 'pause'
+  src: '',
+  currentTime: 0.0,
+  state: 'pause'
 };
+
+var updateStatsTimeout = null;
 
 function addMessage(msg)
 {
-    var item = document.createElement('li');
-    item.textContent = msg;
-    messages.appendChild(item);
-    chat_panel.scrollTo(0, chat_panel.scrollHeight);
+  var item = document.createElement('li');
+  item.textContent = msg;
+  messages.appendChild(item);
+  chat_panel.scrollTo(0, chat_panel.scrollHeight);
 }
