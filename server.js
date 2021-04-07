@@ -29,7 +29,6 @@ io.on('connection', socket =>
     var user = getUser(username);
     if (!user)
     {
-
       user = joinUser(socket.id, username);
       socket.broadcast.emit('message', `${user.username} has joined!`);
       socket.emit('message', 'Welcome to trashy sync video, ' + user.username + '!');
