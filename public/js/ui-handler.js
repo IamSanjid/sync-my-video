@@ -27,7 +27,7 @@ function handleVideoEvt(evt)
   {
     currentVideoStats.state = evt;
   }
-  if (!onEvent)
+  if (!onServerEvent)
   {
     currentVideoStats.currentTime = player.currentTime();
     socket.emit('videoEvt', evt, currentVideoStats);
