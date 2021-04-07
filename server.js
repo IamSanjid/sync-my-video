@@ -26,12 +26,21 @@ io.on('connection', socket =>
   console.log('new ws connection...');
   socket.on('join', (username) =>
   {
-    const user = joinUser(socket.id, username);
-    socket.broadcast.emit('message', `${user.username} has joined!`);
-    socket.emit('message', 'Welcome to trashy sync video, ' + user.username + '!');
-    if (videoStats)
+    var user = getUser(username);
+    if (!user)
     {
-      socket.emit('loadVideo', videoStats.stats);
+
+      user = joinUser(socket.id, username);
+      socket.broadcast.emit('message', `${user.username} has joined!`);
+      socket.emit('message', 'Welcome to trashy sync video, ' + user.username + '!');
+      if (videoStats)
+      {
+        socket.emit('loadVideo', videoStats.stats);
+      }
+    }
+    else
+    {
+      socket.emit('failJoin');
     }
   });
   socket.on('chatMessage', (msg) =>
@@ -51,7 +60,7 @@ io.on('connection', socket =>
     if (videoStats)
     {
       const procEvt = videoStats.processVideoEvt(evt, _videoStats);
-      if (procEvt !== null)
+      if (procEvt)
       {
         socket.broadcast.emit('videoEvt', procEvt, videoStats.stats);
       }
@@ -60,7 +69,7 @@ io.on('connection', socket =>
   socket.on('updateVideoStats', (_videoStats) =>
   {
     const id = videoStats.followUserId;
-    if (id)
+    if (socket.id === id)
     {
       const changedEvt = videoStats.updateStats(_videoStats);
       if (changedEvt)
@@ -83,7 +92,7 @@ io.on('connection', socket =>
       console.log('[*]no more users left resetting video stats...[*]');
       videoStats = null;
     }
-    else
+    else if (videoStats)
     {
       videoStats.followUserId = getFirstUser().id;
     }

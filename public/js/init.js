@@ -33,6 +33,8 @@ var currentVideoStats =
 };
 
 var updateStatsTimeout = null;
+var hasEnded = false;
+var onServerEvent = false;
 
 function addMessage(msg)
 {

@@ -1,4 +1,4 @@
-module.exports = class videostats 
+class videostats 
 {
   constructor(url, currentTime = 0.0, state = 'pause')
   {
@@ -44,3 +44,6 @@ module.exports = class videostats
     return event;
   }
 };
+
+exports.videostats = videostats;
+module.exports.videostats = videostats;

@@ -16,20 +16,11 @@ socket.on('loadVideo', (videoStats) =>
 
 socket.on('videoEvt', (evt, videoStats) =>
 {
-  currentVideoStats = videoStats;
   console.log('server forward evt: ' + evt);
-  if (evt === 'play')
-  {        
-    player.currentTime(currentVideoStats.currentTime);        
-    player.play();
-  }
-  else if (evt === 'pause')
-  {        
-    player.currentTime(currentVideoStats.currentTime);
-    player.pause();
-  }
-  else if (evt === 'seek')
-  {
-    player.currentTime(currentVideoStats.currentTime);        
-  }
+  handleServerVideoEvt(evt, videoStats);
+});
+
+socket.on('failJoin', () =>
+{
+  window.location.href = '/?error=failJoin';
 });

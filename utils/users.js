@@ -1,15 +1,15 @@
 const users = [];
 
-function joinUser(id, name)
+function joinUser(id, username)
 {
-  const user = { id: id, username: name };
+  const user = { id, username };
   users.push(user);
   return user;
 }
 
-function getUser(id)
+function getUser(key)
 {
-  return users.find(user => user.id === id);
+  return users.find(user => user.id === key || user.username === key);
 }
 
 function userLeave(id) {
