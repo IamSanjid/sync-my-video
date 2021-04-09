@@ -18,6 +18,11 @@ const chat_panel = document.getElementById('chat-panel');
 const options = {
 };
 const player = videojs('my-player', options, function onPlayerReady() {
+  if (username.length === 0 || !username.trim())
+  {
+    window.location.href = '/?error=invalid';
+    return;
+  }
   videojs.log(username + ', your player is ready!');
   
   socket.emit('join', username);

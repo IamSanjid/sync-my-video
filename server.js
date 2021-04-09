@@ -44,7 +44,10 @@ io.on('connection', socket =>
   });
   socket.on('chatMessage', (msg) =>
   {
-    io.emit('chatMessage', { username: getUser(socket.id).username, msg: msg });
+    if (msg.length !== 0 || msg.trim())
+    {
+      io.emit('chatMessage', { username: getUser(socket.id).username, msg: msg });
+    }
   });
   
   socket.on('loadVideo', (url) =>
