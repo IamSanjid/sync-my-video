@@ -37,6 +37,10 @@ function handleVideoEvt(evt)
 
 async function handleServerVideoEvt(evt, stats)
 {
+  if (!isPlayerReady()) 
+  {
+    return;
+  }
   currentVideoStats = stats;
   onServerEvent = true;
   /* on seeking event will be called... */

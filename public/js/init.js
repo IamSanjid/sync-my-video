@@ -48,3 +48,8 @@ function addMessage(msg)
   messages.appendChild(item);
   chat_panel.scrollTo(0, chat_panel.scrollHeight);
 }
+
+function isPlayerReady()
+{
+  return player.src() && player.readyState() >= 2;
+}
