@@ -59,18 +59,15 @@ io.on('connection', socket =>
   socket.on('videoEvt', (evt, _videoStats) =>
   {
     console.log(`video event: ${evt}`);
-    if (videoStats)
+    const procEvt = videoStats?.processVideoEvt(evt, _videoStats);
+    if (procEvt)
     {
-      const procEvt = videoStats.processVideoEvt(evt, _videoStats);
-      if (procEvt)
-      {
-        socket.broadcast.emit('videoEvt', procEvt, videoStats.stats);
-      }
+      socket.broadcast.emit('videoEvt', procEvt, videoStats.stats);
     }
   });
   socket.on('updateVideoStats', (_videoStats) =>
   {
-    const id = videoStats.followUserId;
+    const id = videoStats?.followUserId;
     if (socket.id === id)
     {
       const changedEvt = videoStats.updateStats(_videoStats);
