@@ -57,13 +57,71 @@ async function handleServerVideoEvt(evt, stats)
   }
 }
 
+function addCC(data)
+{
+  if (currentVideoStats.currentTime > 0 && currentVideoStats.state === 'play')
+  {
+    return;
+  }
+  var vttBlob = new Blob([data.bytes], { type: 'text/vtt' });
+  var blobURL = URL.createObjectURL(vttBlob);
+  player.addRemoteTextTrack({
+    src: blobURL,
+    srclang: data.srclang,
+    label: data.label,
+    kind: 'subtitles'
+  }, true);
+}
+
+function handleCMD(msg)
+{
+  var args = msg.split(" ");
+  if (args && args.length > 1)
+  {
+    console.log(args);
+    switch(args[0])
+    {
+      case 'addCC':
+        srt_label.value = args[1];
+        srt_file.click();
+        break;
+    }
+  }
+}
+
+srt_file.addEventListener('change', async () =>
+{
+  if (srt_file.files && srt_file.files[0])
+  {
+    var fileBytes = new Uint8Array(await srt_file.files[0].arrayBuffer());
+    const slabel = srt_label.value;
+    var data = 
+    {
+      bytes: fileBytes,
+      label: slabel,
+      srclang: slabel.length > 2 ? slabel.substring(0, 2) : slabel
+    };
+    console.log(data);
+    socket.emit('addSrt', data);
+    srt_label.value = '';
+  }
+});
+
 chat_form.addEventListener('submit', (e) =>
 {
   e.preventDefault();
   if (chat_input.value)
   {
-    console.log(chat_input.value);
-    socket.emit('chatMessage', chat_input.value);
+    const msg = chat_input.value;
+    console.log(msg);
+    if (msg.startsWith('!'))
+    {
+      handleCMD(msg.replace('!', '')); 
+    }
+    else
+    {
+      socket.emit('chatMessage', msg);
+    }
   }
   
   chat_input.value = '';

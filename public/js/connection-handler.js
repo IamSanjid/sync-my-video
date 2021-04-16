@@ -24,3 +24,8 @@ socket.on('failJoin', () =>
 {
   window.location.href = '/?error=failJoin';
 });
+
+socket.on('addCC', (data) =>
+{
+  addCC(data);
+});

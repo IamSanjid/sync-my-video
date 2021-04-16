@@ -4,7 +4,8 @@
   "description": "simple project to sync a video file",
   "dependencies": {
     "express": "^4.17.1",
-    "socket.io": "^3.1.2"
+    "socket.io": "^3.1.2",
+    "text-encoding": "^0.7.0"
   },
   "scripts": {
     "start": "node server",

@@ -15,9 +15,10 @@ const chat_form = document.getElementById("chat-form");
 const messages = document.getElementById('messages');
 const chat_panel = document.getElementById('chat-panel');
 
-const options = {
-};
-const player = videojs('my-player', options, function onPlayerReady() {
+const srt_file = document.getElementById('srt-file');
+const srt_label = document.getElementById('srt-label');
+
+const player = videojs('my-player', {}, function onPlayerReady() {
   if (username.length === 0 || !username.trim())
   {
     window.location.href = '/?error=invalid';

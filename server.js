@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
+const textencoding = require('text-encoding');
 const {
   joinUser,
   getUser,
@@ -10,10 +11,13 @@ const {
   getFirstUser
 } = require('./utils/users');
 const videostats = require('./utils/video-stats');
+const { srt2webvtt } = require('./utils/srt2webvtt');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+const TextEncoder = new textencoding.TextEncoder();
+const TextDecoder = new textencoding.TextDecoder();
 
 const port = process.env.PORT || 3000;
 
@@ -63,6 +67,23 @@ io.on('connection', socket =>
     if (procEvt)
     {
       socket.broadcast.emit('videoEvt', procEvt, videoStats.stats);
+    }
+  });
+  socket.on('addSrt', (data) =>
+  {
+    if (videoStats)
+    {
+      const webvtt = srt2webvtt(TextDecoder.decode(data.bytes));
+      if (webvtt.trim() && webvtt.length > 0)
+      {
+        console.log(webvtt.slice(0, 10));
+        io.emit('addCC', 
+        {
+          bytes: TextEncoder.encode(webvtt),
+          label: data.label,
+          srclang: data.srclang
+        });
+      }
     }
   });
   socket.on('updateVideoStats', (_videoStats) =>
